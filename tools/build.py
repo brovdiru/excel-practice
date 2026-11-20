@@ -9,6 +9,33 @@ PAGES = [
   dict(file="index.html", topic=None, title="Excel Formula Practice Test",
        h1="Excel Formula Practice",
        desc=None, article=None),
+  dict(file="indeed-excel-assessment-practice.html", topic=["basics","logic","cond","lookup","text","adv"], title="Indeed Excel Assessment Practice",
+       h1="Practice for the Indeed Excel assessment",
+       desc="Free practice for the Indeed Excel skills assessment: real formulas on a sales table, checked instantly, plus a timed 15-minute mock test.",
+       article="""<h2>What the Indeed Excel assessment covers</h2>
+<p>Employers on Indeed can ask applicants to take a short Excel skills assessment. The exact questions change and are not public, but they focus on everyday spreadsheet work: totals and averages, conditional sums, lookups, simple IF logic and formatting.</p>
+<p>The exercises on this page train the formula part. You get a small sales table and type the formula yourself, which is harder than picking an option and prepares you better.</p>
+<h3>How to prepare in one evening</h3>
+<ul><li>Solve the Basics and Conditional sections first. They cover most points in a typical test.</li><li>Learn VLOOKUP with FALSE and one modern alternative, XLOOKUP or INDEX/MATCH.</li><li>Take the 15-minute mock test. If you score 8 of 10, you are in good shape.</li></ul>
+<p class="meta">This site is independent and not affiliated with Indeed.</p>"""),
+  dict(file="kenexa-excel-test-practice.html", topic=["basics","logic","cond","lookup","text","adv"], title="Kenexa Excel Test Practice",
+       h1="Practice for the Kenexa (IBM) Excel test",
+       desc="Prepare for the Kenexa Prove It Excel test with free interactive formula exercises: SUMIF, VLOOKUP, IF, text functions and absolute references.",
+       article="""<h2>About the Kenexa Excel test</h2>
+<p>Kenexa Prove It, now part of IBM's assessment tools, is used by recruitment agencies and large employers. Its Excel tests are usually simulations: you get a workbook and must perform a task in it, often against a time limit. Versions range from basic to advanced.</p>
+<p>Because it is task-based, the best preparation is writing real formulas, not memorising menu names. That is what you do here.</p>
+<h3>What to focus on</h3>
+<ul><li>Formulas across a range, and copying them down correctly with <code>$</code> signs.</li><li>Conditional functions: SUMIF, COUNTIF and their multi-condition versions.</li><li>Lookups with VLOOKUP and INDEX/MATCH.</li><li>Speed. Use the timed mock test to practise under pressure.</li></ul>
+<p class="meta">This site is independent and not affiliated with IBM or Kenexa.</p>"""),
+  dict(file="testgorilla-excel-test-practice.html", topic=["basics","logic","cond","lookup","text","adv"], title="TestGorilla Excel Test Practice",
+       h1="Practice for the TestGorilla Excel test",
+       desc="Free practice for TestGorilla Microsoft Excel skills tests: interactive formulas, instant feedback and a timed mock interview test.",
+       article="""<h2>About TestGorilla Excel tests</h2>
+<p>TestGorilla is a pre-employment testing platform that many companies use for screening. Its Microsoft Excel tests are short and timed, and they check whether you can use formulas and functions to answer practical questions about data.</p>
+<p>Short timed tests reward speed. Knowing the right function immediately matters more than knowing every option.</p>
+<h3>A quick plan</h3>
+<ul><li>Make sure SUM, AVERAGE, COUNTIF and SUMIF are automatic for you.</li><li>Know when to use SUMIFS instead of SUMIF and remember that its sum range comes first.</li><li>Practise lookups and IFERROR.</li><li>Finish with the 15-minute mock test to check your pace.</li></ul>
+<p class="meta">This site is independent and not affiliated with TestGorilla.</p>"""),
   dict(file="vlookup-practice.html", topic=["lookup"], title="VLOOKUP and XLOOKUP Practice",
        h1="VLOOKUP, INDEX/MATCH and XLOOKUP practice",
        desc="Practice VLOOKUP, INDEX/MATCH, XLOOKUP and IFERROR on a real sales table. Type the formula, get instant feedback. Free, no sign-up.",
