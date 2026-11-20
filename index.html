@@ -224,7 +224,7 @@ footer{max-width:720px;margin:40px auto 0;color:var(--muted);font-size:.8rem;bor
     <p>Yes for almost everything. The functions here behave the same in Google Sheets.</p>
     <h3>Is my progress saved?</h3>
     <p>Solved exercises are remembered in this browser, so you can come back later.</p>
-  </article>
+  <h2>More practice</h2><ul><li><a href="./">All 29 exercises and the mock interview test</a></li><li><a href="vlookup-practice.html">VLOOKUP and XLOOKUP Practice</a></li><li><a href="sumif-countif-practice.html">SUMIF and COUNTIF Practice</a></li><li><a href="if-function-practice.html">Excel IF Function Practice</a></li><li><a href="excel-text-functions-practice.html">Excel Text Functions Practice</a></li><li><a href="excel-basic-formulas-practice.html">Basic Excel Formulas Practice</a></li></ul></article>
 
   <!-- AD SLOT 2 -->
   <div class="ad-slot article" hidden>Advertisement</div>
@@ -553,6 +553,8 @@ const TASKS=[
   {id:'abs',sec:'adv',title:'Share of total ($ signs)',target:'H2',fill:12,prompt:'In <b>H2</b>, write each order’s share of total revenue as a decimal (e.g. 0.12). The formula must still be right when copied down to H13.',solution:'=G2/SUM($G$2:$G$13)',refs:['G2'],syntax:'cell / SUM($G$2:$G$13)',hint:'Lock the total range with $ signs so it does not move when copied: $G$2:$G$13.'}
 ];
 TASKS.forEach(t=>{t.solAst=parse(t.solution.slice(1))});
+const TOPIC=window.PAGE_TOPIC||null;
+const VIS=TOPIC?TASKS.filter(t=>TOPIC.includes(t.sec)):TASKS;
 
 /* ================= Checking ================= */
 function run(ast,cell){try{let v=evaluator(getCell,cell)(ast);if(v instanceof Arr&&v.h===1&&v.w===1)v=v.rows[0][0];return{v}}catch(e){if(e instanceof XErr)return{err:e};throw e}}
@@ -593,7 +595,7 @@ function check(task,formula){
 const $=id=>document.getElementById(id);
 const store={get(){try{return JSON.parse(localStorage.getItem('xlp_v1'))||{}}catch(e){return{}}},set(v){try{localStorage.setItem('xlp_v1',JSON.stringify(v))}catch(e){}}};
 const saved=store.get();
-const state={solved:saved.solved||{},drafts:{},cur:saved.cur&&TASKS.some(t=>t.id===saved.cur)?saved.cur:TASKS[0].id,mode:'practice',mock:null,shown:null};
+const state={solved:saved.solved||{},drafts:{},cur:saved.cur&&VIS.some(t=>t.id===saved.cur)?saved.cur:VIS[0].id,mode:'practice',mock:null,shown:null};
 const persist=()=>store.set({solved:state.solved,cur:state.cur});
 const task=()=>TASKS.find(t=>t.id===state.cur);
 const fx=$('fx');let caret=null;
@@ -627,20 +629,20 @@ function highlightRefs(){
 function feedback(kind,html){const f=$('feedback');f.className='feedback '+kind;f.innerHTML=html}
 
 function renderList(){
-  const n=Object.keys(state.solved).filter(id=>TASKS.some(t=>t.id===id)).length;
-  $('prog-text').textContent=n+' / '+TASKS.length+' solved';$('prog-bar').style.width=(100*n/TASKS.length)+'%';
-  let h='';for(const s of Object.keys(SECTIONS)){h+='<div class="sec">'+SECTIONS[s]+'</div><ol>';
-    for(const t of TASKS.filter(x=>x.sec===s))h+='<li><button type="button" data-id="'+t.id+'" aria-current="'+(t.id===state.cur)+'"><span class="tick">'+(state.solved[t.id]?'✓':'')+'</span><span>'+esc(t.title)+'</span></button></li>';
+  const n=Object.keys(state.solved).filter(id=>VIS.some(t=>t.id===id)).length;
+  $('prog-text').textContent=n+' / '+VIS.length+' solved';$('prog-bar').style.width=(100*n/VIS.length)+'%';
+  let h='';for(const s of Object.keys(SECTIONS).filter(k=>VIS.some(t=>t.sec===k))){h+='<div class="sec">'+SECTIONS[s]+'</div><ol>';
+    for(const t of VIS.filter(x=>x.sec===s))h+='<li><button type="button" data-id="'+t.id+'" aria-current="'+(t.id===state.cur)+'"><span class="tick">'+(state.solved[t.id]?'✓':'')+'</span><span>'+esc(t.title)+'</span></button></li>';
     h+='</ol>'}
   $('task-list').innerHTML=h;
 }
 function renderTask(){
-  const t=task(),i=TASKS.indexOf(t);
+  const t=task(),i=VIS.indexOf(t);
   $('task-title').textContent=t.title;
   $('task-prompt').innerHTML=t.prompt.includes('<b>')?t.prompt:t.prompt+' Answer in <b>'+t.target+'</b>.';
   $('cellname').textContent=t.target;
   if(state.mode==='mock'){$('task-meta').textContent='';$('task-syntax').textContent=''}
-  else{$('task-meta').textContent=SECTIONS[t.sec]+' · '+(i+1)+' of '+TASKS.length;$('task-syntax').textContent='Syntax: '+t.syntax}
+  else{$('task-meta').textContent=SECTIONS[t.sec]+' · '+(i+1)+' of '+VIS.length;$('task-syntax').textContent='Syntax: '+t.syntax}
   fx.value=state.drafts[t.id]||'';fx.placeholder=state.mode==='mock'?'=':'= type your formula';
   highlightRefs();
   const done=state.mode==='practice'&&state.solved[t.id];
@@ -655,7 +657,7 @@ function doCheck(){
   feedback(kind,esc(r.msg));
   if(r.status==='ok'){state.solved[t.id]=fx.value.trim();persist();renderList()}
 }
-function nextTask(){const i=TASKS.findIndex(t=>t.id===state.cur);const after=TASKS.slice(i+1).concat(TASKS.slice(0,i+1));const n=after.find(t=>!state.solved[t.id])||TASKS[(i+1)%TASKS.length];select(n.id);fx.focus({preventScroll:true})}
+function nextTask(){const i=VIS.findIndex(t=>t.id===state.cur);const after=VIS.slice(i+1).concat(VIS.slice(0,i+1));const n=after.find(t=>!state.solved[t.id])||VIS[(i+1)%VIS.length];select(n.id);fx.focus({preventScroll:true})}
 
 /* Mock test */
 function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
@@ -688,7 +690,7 @@ function setMode(mode){
   $('results').hidden=true;for(const id of ['task-card','editor','actions','feedback'])$(id).hidden=false;
   $('mockbar').hidden=mode!=='mock';$('tasks').hidden=mode==='mock';
   $('btn-hint').hidden=$('btn-solution').hidden=mode==='mock';$('btn-next').textContent=mode==='mock'?'Skip':'Next exercise →';
-  if(mode==='mock'){state.drafts={};startMock()}else{$('btn-check').textContent='Check';state.cur=saved.cur&&TASKS.some(t=>t.id===saved.cur)?state.cur:TASKS[0].id;renderList();renderTask()}
+  if(mode==='mock'){state.drafts={};startMock()}else{$('btn-check').textContent='Check';state.cur=VIS.some(t=>t.id===state.cur)?state.cur:VIS[0].id;renderList();renderTask()}
 }
 
 /* Cell picking: click a cell or drag across a range to insert it into the formula */
@@ -713,9 +715,10 @@ $('btn-next').onclick=()=>state.mode==='mock'?submitMock(true):nextTask();
 $('btn-hint').onclick=()=>feedback('info','Hint: '+esc(task().hint));
 $('btn-solution').onclick=()=>{const t=task();feedback('info','One possible answer: <code>'+esc(t.solution)+'</code>. Type it in yourself and press Check to mark it solved.')};
 $('task-list').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(b)select(b.dataset.id)});
-$('mode-practice').onclick=()=>setMode('practice');$('mode-mock').onclick=()=>setMode('mock');
+$('mode-practice').onclick=()=>setMode('practice');$('mode-mock').onclick=()=>{if(TOPIC){location.href='./#mock';return}setMode('mock')};
 
 buildSheet();renderList();renderTask();
+if(!TOPIC&&location.hash==='#mock')setMode('mock');
 window.__selfTest=()=>TASKS.map(t=>[t.id,check(t,t.solution).status]).filter(x=>x[1]!=='ok');
 </script>
 </html>

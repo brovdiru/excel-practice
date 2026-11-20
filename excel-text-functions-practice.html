@@ -1,0 +1,701 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="canonical" href="https://brovdiru.github.io/excel-practice/excel-text-functions-practice.html">
+<title>Excel Text Functions Practice</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Practice LEFT, RIGHT, MID, LEN, FIND, UPPER and joining text with & in Excel. Split names and build codes with instant feedback.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a working spreadsheet first. Exercise list on the left, task + formula bar + sheet on the right; stacks on phones. */
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#16201b; --muted:#5a6862; --line:#d6ddd8; --head:#e9eeea;
+  --accent:#1d6b57; --accent-ink:#ffffff; --target:#ffefc2; --target-line:#d9a520; --sel:#d3ebe2;
+  --ok:#1c7a45; --ok-bg:#e3f4ea; --bad:#b23a30; --bad-bg:#fbe9e6; --warn:#8a5a00; --warn-bg:#fff4d6;
+  --r1:#2f6fd6; --r2:#c2410c; --r3:#7c3aed; --r4:#0f8a5f;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0f1412; --surface:#161d1a; --ink:#e4ebe7; --muted:#97a69f; --line:#2a3530; --head:#1d2622;
+  --accent:#5fc3a3; --accent-ink:#0c1512; --target:#3d3313; --target-line:#d9a520; --sel:#1d3a31;
+  --ok:#6fd49a; --ok-bg:#163223; --bad:#f08376; --bad-bg:#3a1c18; --warn:#f2c35b; --warn-bg:#352a10;
+  --r1:#78a6f5; --r2:#fb8f5b; --r3:#b394fb; --r4:#4fd1a0; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0f1412; --surface:#161d1a; --ink:#e4ebe7; --muted:#97a69f; --line:#2a3530; --head:#1d2622;
+  --accent:#5fc3a3; --accent-ink:#0c1512; --target:#3d3313; --target-line:#d9a520; --sel:#1d3a31;
+  --ok:#6fd49a; --ok-bg:#163223; --bad:#f08376; --bad-bg:#3a1c18; --warn:#f2c35b; --warn-bg:#352a10;
+  --r1:#78a6f5; --r2:#fb8f5b; --r3:#b394fb; --r4:#4fd1a0; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 40px}
+.wrap{max-width:1180px;margin:0 auto}
+button{font:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{font-family:var(--f-display);text-wrap:balance;line-height:1.15;margin:0}
+
+.top{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding-block:20px 14px}
+.brand{display:flex;align-items:center;gap:10px}
+.logo{width:34px;height:34px;border-radius:7px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;
+  font-family:var(--f-mono);font-weight:600;font-size:15px;font-style:italic}
+.brand h1{font-size:clamp(1.25rem,2.6vw,1.6rem);font-weight:800}
+.brand p{margin:0;color:var(--muted);font-size:.85rem}
+.modes{display:flex;border:1px solid var(--line);border-radius:999px;padding:3px;background:var(--surface)}
+.modes button{border:0;background:none;color:var(--muted);padding:6px 14px;border-radius:999px;font-weight:500}
+.modes button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink)}
+
+.app{display:grid;grid-template-columns:250px minmax(0,1fr);gap:20px;align-items:start}
+.tasks{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);max-height:calc(100vh - 24px);overflow:auto}
+.progress{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-bottom:6px;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--head);overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+.sec{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:12px 0 4px;font-weight:600}
+.tasks ol{list-style:none;margin:0;padding:0}
+.tasks li button{width:100%;text-align:left;border:0;background:none;color:var(--ink);padding:5px 8px;border-radius:6px;display:flex;gap:8px;align-items:baseline;font-size:.9rem}
+.tasks li button:hover{background:var(--head)}
+.tasks li button[aria-current="true"]{background:var(--sel);font-weight:600}
+.tick{width:14px;flex:none;font-family:var(--f-mono);color:var(--ok);font-weight:600}
+
+.work{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px}
+.task-head{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px;align-items:baseline}
+.task-head h2{font-size:1.3rem;font-weight:800}
+.meta{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.prompt{margin:8px 0 0;max-width:68ch}
+.prompt b{font-family:var(--f-mono);font-weight:600;background:var(--target);padding:0 4px;border-radius:3px}
+.prompt code,.article code{font-family:var(--f-mono);font-size:.9em;background:var(--head);padding:1px 5px;border-radius:4px}
+.syntax{margin-top:8px;font-family:var(--f-mono);font-size:.82rem;color:var(--muted)}
+
+.fxbar{display:flex;align-items:stretch;border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.fxbar .cellname{font-family:var(--f-mono);font-weight:600;padding:0 12px;display:grid;place-items:center;border-right:1px solid var(--line);background:var(--head);min-width:56px}
+.fxbar .fx{font-family:var(--f-mono);font-style:italic;color:var(--muted);padding:0 10px;display:grid;place-items:center;border-right:1px solid var(--line)}
+.fxbar input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font-family:var(--f-mono);font-size:1rem;padding:11px 12px;outline:none}
+.fxbar:focus-within{border-color:var(--accent);box-shadow:0 0 0 2px var(--sel)}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:8px 14px;border-radius:7px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:600}
+.btn[disabled]{opacity:.45;cursor:default}
+.tip{font-size:.82rem;color:var(--muted);margin:0}
+
+.feedback{border-radius:8px;padding:10px 14px;font-size:.93rem}
+.feedback.ok{background:var(--ok-bg);color:var(--ok)}
+.feedback.bad{background:var(--bad-bg);color:var(--bad)}
+.feedback.warn{background:var(--warn-bg);color:var(--warn)}
+.feedback.info{background:var(--head);color:var(--ink)}
+.feedback code{font-family:var(--f-mono)}
+
+.sheet-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--surface);-webkit-overflow-scrolling:touch}
+table.sheet{border-collapse:collapse;font-family:var(--f-mono);font-size:.84rem;font-variant-numeric:tabular-nums;user-select:none;touch-action:pan-x pan-y}
+.sheet th{background:var(--head);color:var(--muted);font-weight:400;border:1px solid var(--line);padding:3px 6px;min-width:30px;font-size:.75rem}
+.sheet td{border:1px solid var(--line);padding:4px 8px;white-space:nowrap;min-width:64px;cursor:cell;position:relative}
+.sheet td.hdr{font-weight:600;background:color-mix(in srgb,var(--head) 55%,var(--surface))}
+.sheet td.num{text-align:right}
+.sheet td.target{background:var(--target);outline:2px solid var(--target-line);outline-offset:-2px;font-weight:600}
+.sheet td.result{background:var(--target)}
+.sheet td.sel{background:var(--sel)}
+.sheet td.gap{min-width:18px;padding:0;background:var(--bg)}
+.sheet td.h1{box-shadow:inset 0 0 0 2px var(--r1)} .sheet td.h2{box-shadow:inset 0 0 0 2px var(--r2)}
+.sheet td.h3{box-shadow:inset 0 0 0 2px var(--r3)} .sheet td.h4{box-shadow:inset 0 0 0 2px var(--r4)}
+.legend{font-size:.8rem;color:var(--muted)}
+
+.mockbar{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center}
+.timer{font-family:var(--f-mono);font-size:1.3rem;font-weight:600;font-variant-numeric:tabular-nums}
+.timer.low{color:var(--bad)}
+.results ol{padding-left:1.2em;margin:10px 0 0}
+.results li{margin-bottom:8px}
+.results .sol{font-family:var(--f-mono);font-size:.85rem;color:var(--muted)}
+.score{font-family:var(--f-display);font-size:2.4rem;font-weight:800}
+
+.article{max-width:720px;margin:48px auto 0}
+.article h2{font-size:1.5rem;margin:28px 0 8px}
+.article h3{font-size:1.1rem;margin:18px 0 4px}
+.article p,.article li{color:var(--ink)}
+.article ul{padding-left:1.2em}
+.ad-slot{min-height:90px;border:1px dashed var(--line);border-radius:8px;display:grid;place-items:center;color:var(--muted);font-size:.8rem}
+footer{max-width:720px;margin:40px auto 0;color:var(--muted);font-size:.8rem;border-top:1px solid var(--line);padding-top:14px}
+
+@media (max-width:820px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .tasks{position:static;max-height:none;order:2}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">fx</div>
+      <div>
+        <h1>Excel text functions practice</h1>
+        <p>Real formulas, checked like Excel would. Free, no sign-up.</p>
+      </div>
+    </div>
+    <div class="modes" role="group" aria-label="Mode">
+      <button id="mode-practice" type="button" aria-pressed="true">Practice</button>
+      <button id="mode-mock" type="button" aria-pressed="false">Mock interview test</button>
+    </div>
+  </header>
+
+  <main class="app">
+    <aside class="tasks" id="tasks" aria-label="Exercises">
+      <div class="progress"><span>Your progress</span><span id="prog-text">0 / 0</span></div>
+      <div class="bar"><i id="prog-bar"></i></div>
+      <div id="task-list"></div>
+    </aside>
+
+    <section class="work" aria-live="polite">
+      <div class="card mockbar" id="mockbar" hidden>
+        <div><strong id="mock-pos">Question 1 of 10</strong><div class="meta">No hints in test mode. Results at the end.</div></div>
+        <div class="timer" id="timer">15:00</div>
+      </div>
+
+      <div class="card" id="task-card">
+        <div class="task-head">
+          <h2 id="task-title">Total revenue</h2>
+          <span class="meta" id="task-meta">Basics · 1 of 29</span>
+        </div>
+        <p class="prompt" id="task-prompt"></p>
+        <div class="syntax" id="task-syntax"></div>
+      </div>
+
+      <div class="card results" id="results" hidden></div>
+
+      <div id="editor">
+        <div class="fxbar">
+          <div class="cellname" id="cellname">H2</div>
+          <div class="fx" aria-hidden="true">fx</div>
+          <input id="fx" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Formula" placeholder="=SUM(G2:G13)">
+        </div>
+      </div>
+
+      <div class="actions" id="actions">
+        <button class="btn primary" id="btn-check" type="button">Check</button>
+        <button class="btn" id="btn-hint" type="button">Hint</button>
+        <button class="btn" id="btn-solution" type="button">Show solution</button>
+        <button class="btn" id="btn-next" type="button">Next exercise →</button>
+      </div>
+
+      <div class="feedback info" id="feedback">Type a formula starting with <code>=</code> and press Enter. Click or drag over cells to insert references.</div>
+
+      <div class="sheet-wrap"><table class="sheet" id="sheet"></table></div>
+      <p class="legend">Sales data for 12 orders (A–G) and a product list (J–L). Your answer goes in the yellow cell.</p>
+    </section>
+  </main>
+
+  <!-- AD SLOT 1: paste AdSense <ins> unit here after approval, then remove "hidden" -->
+  <div class="ad-slot article" hidden>Advertisement</div>
+
+  <article class="article"><h2>Text tasks in Excel tests</h2>
+<p>Splitting a full name into first and last name, or building a code from several columns, shows up in admin, HR and data-entry assessments.</p>
+<h3>First name</h3>
+<p><code>=LEFT(C2,FIND(" ",C2)-1)</code>. FIND returns the position of the space, and LEFT takes everything before it. In Excel 365 <code>=TEXTBEFORE(C2," ")</code> does the same.</p>
+<h3>Last name</h3>
+<p><code>=RIGHT(C6,LEN(C6)-FIND(" ",C6))</code>. The length of the name minus the position of the space gives the number of characters to take from the right.</p>
+<h3>Joining text</h3>
+<p>The <code>&amp;</code> operator joins values: <code>=UPPER(B2)&amp;"-"&amp;A2</code> turns East and 1001 into EAST-1001. CONCAT and TEXTJOIN work too.</p><h2>More practice</h2><ul><li><a href="./">All 29 exercises and the mock interview test</a></li><li><a href="vlookup-practice.html">VLOOKUP and XLOOKUP Practice</a></li><li><a href="sumif-countif-practice.html">SUMIF and COUNTIF Practice</a></li><li><a href="if-function-practice.html">Excel IF Function Practice</a></li><li><a href="excel-basic-formulas-practice.html">Basic Excel Formulas Practice</a></li></ul></article>
+
+  <!-- AD SLOT 2 -->
+  <div class="ad-slot article" hidden>Advertisement</div>
+
+  <footer><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · Excel is a trademark of Microsoft Corporation. This site is not affiliated with Microsoft.</footer>
+</div>
+
+<script>window.PAGE_TOPIC=["text"];</script>
+<script>
+/* ================= Formula engine ================= */
+class XErr{constructor(code,msg){this.code=code;this.msg=msg||''}}
+class Arr{constructor(rows){this.rows=rows}get h(){return this.rows.length}get w(){return this.rows[0]?this.rows[0].length:0}flat(){return this.rows.flat()}}
+const fail=(c,m)=>{throw new XErr(c,m)};
+function colIdx(s){let n=0;for(const ch of s.toUpperCase())n=n*26+(ch.charCodeAt(0)-64);return n-1}
+function colName(i){let s='';i++;while(i>0){const m=(i-1)%26;s=String.fromCharCode(65+m)+s;i=Math.floor((i-1)/26)}return s}
+function addr(a){const m=a.match(/^([A-Z]+)(\d+)$/);return{c:colIdx(m[1]),r:+m[2]}}
+const aname=(c,r)=>colName(c)+r;
+
+function tokenize(src){
+  const toks=[];let i=0;const refRe=/^(\$?)([A-Za-z]{1,3})(\$?)([1-9]\d*)/;
+  while(i<src.length){
+    const ch=src[i];
+    if(/\s/.test(ch)){i++;continue}
+    if(ch==='"'||ch==='\u201c'||ch==='\u201d'){let j=i+1,s='';
+      for(;;){if(j>=src.length)throw new SyntaxError('A text value is missing its closing quote mark.');
+        const q=src[j];if(q==='"'||q==='\u201c'||q==='\u201d'){if(src[j+1]==='"'){s+='"';j+=2;continue}break}s+=src[j++]}
+      toks.push({t:'str',v:s});i=j+1;continue}
+    const rest=src.slice(i);
+    if(/[0-9.]/.test(ch)){const m=rest.match(/^(\d+\.?\d*|\.\d+)(e[+-]?\d+)?/i);if(!m)throw new SyntaxError('Unexpected "'+ch+'".');toks.push({t:'num',v:parseFloat(m[0])});i+=m[0].length;continue}
+    let m=rest.match(refRe);
+    if(m&&!/^[A-Za-z0-9_(]/.test(rest.slice(m[0].length).replace(/^\s+(?=\()/,''))){
+      const a={c:colIdx(m[2]),r:+m[4],ac:!!m[1],ar:!!m[3]};let len=m[0].length;
+      const after=rest.slice(len).match(/^\s*:\s*/);
+      if(after){const m2=rest.slice(len+after[0].length).match(refRe);
+        if(!m2)throw new SyntaxError('A range needs a cell on both sides of the colon, like A2:A13.');
+        len+=after[0].length+m2[0].length;
+        toks.push({t:'range',c1:a.c,r1:a.r,ac1:a.ac,ar1:a.ar,c2:colIdx(m2[2]),r2:+m2[4],ac2:!!m2[1],ar2:!!m2[3]});
+      }else toks.push({t:'ref',...a});
+      i+=len;continue}
+    m=rest.match(/^[A-Za-z_][A-Za-z0-9_.]*/);
+    if(m){const name=m[0];const after=rest.slice(name.length);
+      if(/^\s*\(/.test(after)){toks.push({t:'func',v:name.toUpperCase()});i+=name.length;continue}
+      if(/^(TRUE|FALSE)$/i.test(name)){toks.push({t:'bool',v:name.toUpperCase()==='TRUE'});i+=name.length;continue}
+      throw new SyntaxError('Excel would show #NAME? for "'+name+'". Text values need double quotes, like "'+name+'".')}
+    const two=src.substr(i,2);
+    if(two==='<='||two==='>='||two==='<>'){toks.push({t:'op',v:two});i+=2;continue}
+    if('+-*/^&=<>%'.includes(ch)){toks.push({t:'op',v:ch});i++;continue}
+    if(ch==='('||ch===')'){toks.push({t:ch});i++;continue}
+    if(ch===','||ch===';'){toks.push({t:','});i++;continue}
+    throw new SyntaxError('Excel does not understand the character "'+ch+'".');
+  }
+  return toks;
+}
+function parse(src){
+  const toks=tokenize(src);let p=0;
+  const peek=()=>toks[p],next=()=>toks[p++];
+  const isOp=(...vs)=>peek()&&peek().t==='op'&&vs.includes(peek().v);
+  const desc=t=>!t?'the end':t.t==='op'?'"'+t.v+'"':t.t===','?'a comma':t.t==='('||t.t===')'?'"'+t.t+'"':'"'+(t.v??'')+'"';
+  const expr=()=>cmp();
+  function cmp(){let a=cat();while(isOp('=','<>','<','>','<=','>=')){const op=next().v;a={k:'bin',op,a,b:cat()}}return a}
+  function cat(){let a=add();while(isOp('&')){next();a={k:'bin',op:'&',a,b:add()}}return a}
+  function add(){let a=mul();while(isOp('+','-')){const op=next().v;a={k:'bin',op,a,b:mul()}}return a}
+  function mul(){let a=pow();while(isOp('*','/')){const op=next().v;a={k:'bin',op,a,b:pow()}}return a}
+  function pow(){let a=unary();while(isOp('^')){next();a={k:'bin',op:'^',a,b:unary()}}return a}
+  function unary(){if(isOp('-')){next();return{k:'neg',a:unary()}}if(isOp('+')){next();return unary()}return post()}
+  function post(){let a=prim();while(isOp('%')){next();a={k:'pct',a}}return a}
+  function prim(){
+    const t=next();
+    if(!t)throw new SyntaxError('The formula ends too early. Is something missing at the end?');
+    switch(t.t){
+      case 'num':return{k:'num',v:t.v};
+      case 'str':return{k:'str',v:t.v};
+      case 'bool':return{k:'bool',v:t.v};
+      case 'ref':return{k:'ref',c:t.c,r:t.r,ac:t.ac,ar:t.ar};
+      case 'range':return{k:'range',...t};
+      case 'func':{next();const args=[];
+        if(peek()&&peek().t===')'){next();return{k:'call',name:t.v,args}}
+        for(;;){
+          if(peek()&&(peek().t===','||peek().t===')'))args.push({k:'blank'});else args.push(expr());
+          const s=next();
+          if(!s)throw new SyntaxError(t.v+'( is missing its closing bracket.');
+          if(s.t===')')break;
+          if(s.t!==',')throw new SyntaxError('Expected a comma or ")" inside '+t.v+'(), found '+desc(s)+'.');
+        }
+        return{k:'call',name:t.v,args}}
+      case '(':{const e=expr();const s=next();if(!s||s.t!==')')throw new SyntaxError('A bracket "(" is never closed.');return e}
+      default:throw new SyntaxError('Unexpected '+desc(t)+' in the formula.');
+    }
+  }
+  const ast=expr();
+  if(p<toks.length)throw new SyntaxError(toks[p].t===')'?'There is an extra ")" in the formula.':'Unexpected '+desc(toks[p])+'. Check for a missing operator or comma.');
+  return ast;
+}
+
+const fmtNum=n=>{const s=Number(n.toPrecision(15));return String(Math.abs(s)<1e-12?0:s)};
+function toNum(v){
+  if(typeof v==='number')return v;
+  if(typeof v==='boolean')return v?1:0;
+  if(v===null)return 0;
+  if(typeof v==='string'){const t=v.trim();if(t!==''&&!isNaN(Number(t)))return Number(t);fail('#VALUE!','"'+v+'" is text, so Excel cannot do maths with it.')}
+  if(v instanceof Arr)return toNum(one(v));
+  return 0;
+}
+function toStr(v){if(typeof v==='number')return fmtNum(v);if(typeof v==='boolean')return v?'TRUE':'FALSE';if(v===null)return '';if(v instanceof Arr)return toStr(one(v));return String(v)}
+function toBool(v){if(v instanceof Arr)v=one(v);if(typeof v==='boolean')return v;if(typeof v==='number')return v!==0;if(v===null)return false;
+  const u=String(v).toUpperCase();if(u==='TRUE')return true;if(u==='FALSE')return false;fail('#VALUE!','"'+v+'" is not TRUE or FALSE.')}
+function one(v){if(v instanceof Arr){if(v.h===1&&v.w===1)return v.rows[0][0];fail('#VALUE!','A range was used where Excel expects a single value.')}return v}
+const rank=v=>typeof v==='number'?1:typeof v==='string'?2:3;
+function cmp(a,b){
+  if(a===null)a=typeof b==='string'?'':typeof b==='boolean'?false:0;
+  if(b===null)b=typeof a==='string'?'':typeof a==='boolean'?false:0;
+  if(rank(a)!==rank(b))return rank(a)-rank(b);
+  if(typeof a==='string'){const x=a.toLowerCase(),y=b.toLowerCase();return x<y?-1:x>y?1:0}
+  return (+a)-(+b);
+}
+function bcast(a,b,f){
+  const A=a instanceof Arr,B=b instanceof Arr;if(!A&&!B)return f(a,b);
+  const h=Math.max(A?a.h:1,B?b.h:1),w=Math.max(A?a.w:1,B?b.w:1);
+  const g=(x,i,j)=>x instanceof Arr?((x.rows[x.h===1?0:i]||[])[x.w===1?0:j]):x;
+  const rows=[];for(let i=0;i<h;i++){const r=[];for(let j=0;j<w;j++){const xa=g(a,i,j),xb=g(b,i,j);if(xa===undefined||xb===undefined)fail('#N/A','The two ranges have different sizes.');r.push(f(xa,xb))}rows.push(r)}
+  return new Arr(rows);
+}
+function binop(op,a,b){
+  return bcast(a,b,(x,y)=>{
+    switch(op){
+      case '+':return toNum(x)+toNum(y);
+      case '-':return toNum(x)-toNum(y);
+      case '*':return toNum(x)*toNum(y);
+      case '/':{const d=toNum(y);if(d===0)fail('#DIV/0!','The formula divides by zero.');return toNum(x)/d}
+      case '^':return Math.pow(toNum(x),toNum(y));
+      case '&':return toStr(x)+toStr(y);
+      case '=':return cmp(x,y)===0;
+      case '<>':return cmp(x,y)!==0;
+      case '<':return cmp(x,y)<0;
+      case '>':return cmp(x,y)>0;
+      case '<=':return cmp(x,y)<=0;
+      case '>=':return cmp(x,y)>=0;
+    }
+  });
+}
+function wild(s){return new RegExp('^'+s.replace(/[.+^${}()|[\]\\]/g,'\\$&').replace(/~\*/g,'\u0001').replace(/~\?/g,'\u0002').replace(/\*/g,'.*').replace(/\?/g,'.').replace(/\u0001/g,'\\*').replace(/\u0002/g,'\\?')+'$','i')}
+function mkCrit(c){
+  if(c instanceof Arr)c=one(c);
+  if(typeof c==='number')return v=>typeof v==='number'&&Math.abs(v-c)<1e-12;
+  if(typeof c==='boolean')return v=>v===c;
+  let s=c===null?'':String(c),op='=';
+  const m=s.match(/^(<=|>=|<>|<|>|=)/);if(m){op=m[1];s=s.slice(op.length)}
+  const n=s.trim()!==''&&!isNaN(Number(s))?Number(s):null;
+  const test=(d)=>op==='='?d===0:op==='<>'?d!==0:op==='<'?d<0:op==='>'?d>0:op==='<='?d<=0:d>=0;
+  if(n!==null)return v=>typeof v==='number'?test(v-n):op==='<>';
+  if(s===''){if(op==='=')return v=>v===null||v==='';if(op==='<>')return v=>!(v===null||v==='')}
+  if(op==='='||op==='<>'){const re=wild(s);return v=>{const hit=typeof v==='string'&&re.test(v);return op==='='?hit:!hit}}
+  return v=>typeof v==='string'&&test(cmp(v,s));
+}
+function lookEq(x,v){if(typeof x==='string'&&typeof v==='string')return wild(v).test(x);return x!==null&&rank(x)===rank(v)&&cmp(x,v)===0}
+
+/* functions get (args AST, ev, rng) */
+const need=(args,min,max,name)=>{if(args.length<min||args.length>max)fail('#N/A',name+' needs '+(min===max?min:min+' to '+max)+' arguments, you gave '+args.length+'.')};
+function collect(args,ev){const out=[];for(const a of args){if(a.k==='blank')continue;const v=ev(a);if(v instanceof Arr){for(const x of v.flat())if(typeof x==='number')out.push(x)}else if(v!==null)out.push(toNum(v))}return out}
+function roundX(x,d,mode){const f=Math.pow(10,d),s=x<0?-1:1,ax=Math.abs(x)*f;const r=mode==='up'?Math.ceil(ax-1e-9):mode==='down'?Math.floor(ax+1e-9):Math.round(ax+1e-9);return s*r/f}
+function pairsFilter(args,ev,rng,start,name){
+  const conds=[];for(let i=start;i<args.length;i+=2){if(!args[i+1])fail('#N/A',name+' needs a criteria after every range.');conds.push([rng(args[i]),mkCrit(ev(args[i+1]))])}
+  const h=conds[0][0].h,w=conds[0][0].w;
+  for(const [r] of conds)if(r.h!==h||r.w!==w)fail('#VALUE!','All ranges in '+name+' must be the same size.');
+  return (i,j)=>conds.every(([r,f])=>f(r.rows[i][j]));
+}
+const FN={
+  SUM:(a,ev)=>collect(a,ev).reduce((s,x)=>s+x,0),
+  AVERAGE:(a,ev)=>{const n=collect(a,ev);if(!n.length)fail('#DIV/0!','There are no numbers to average.');return n.reduce((s,x)=>s+x,0)/n.length},
+  MIN:(a,ev)=>{const n=collect(a,ev);return n.length?Math.min(...n):0},
+  MAX:(a,ev)=>{const n=collect(a,ev);return n.length?Math.max(...n):0},
+  MEDIAN:(a,ev)=>{const n=collect(a,ev).sort((x,y)=>x-y);if(!n.length)fail('#NUM!');const m=n.length>>1;return n.length%2?n[m]:(n[m-1]+n[m])/2},
+  LARGE:(a,ev)=>{need(a,2,2,'LARGE');const n=collect([a[0]],ev).sort((x,y)=>y-x),k=toNum(ev(a[1]));if(k<1||k>n.length)fail('#NUM!','k is out of range.');return n[Math.floor(k)-1]},
+  SMALL:(a,ev)=>{need(a,2,2,'SMALL');const n=collect([a[0]],ev).sort((x,y)=>x-y),k=toNum(ev(a[1]));if(k<1||k>n.length)fail('#NUM!','k is out of range.');return n[Math.floor(k)-1]},
+  COUNT:(a,ev)=>{let c=0;for(const x of a){if(x.k==='blank')continue;const v=ev(x);if(v instanceof Arr)c+=v.flat().filter(y=>typeof y==='number').length;else if(typeof v==='number'||(typeof v==='string'&&v.trim()!==''&&!isNaN(Number(v)))||typeof v==='boolean')c++}return c},
+  COUNTA:(a,ev)=>{let c=0;for(const x of a){if(x.k==='blank')continue;const v=ev(x);if(v instanceof Arr)c+=v.flat().filter(y=>y!==null).length;else if(v!==null)c++}return c},
+  COUNTBLANK:(a,ev,rng)=>{need(a,1,1,'COUNTBLANK');return rng(a[0]).flat().filter(y=>y===null||y==='').length},
+  ROUND:(a,ev)=>{need(a,2,2,'ROUND');return roundX(toNum(ev(a[0])),Math.trunc(toNum(ev(a[1]))))},
+  ROUNDUP:(a,ev)=>{need(a,2,2,'ROUNDUP');return roundX(toNum(ev(a[0])),Math.trunc(toNum(ev(a[1]))),'up')},
+  ROUNDDOWN:(a,ev)=>{need(a,2,2,'ROUNDDOWN');return roundX(toNum(ev(a[0])),Math.trunc(toNum(ev(a[1]))),'down')},
+  INT:(a,ev)=>{need(a,1,1,'INT');return Math.floor(toNum(ev(a[0])))},
+  ABS:(a,ev)=>{need(a,1,1,'ABS');return Math.abs(toNum(ev(a[0])))},
+  SQRT:(a,ev)=>{need(a,1,1,'SQRT');const x=toNum(ev(a[0]));if(x<0)fail('#NUM!');return Math.sqrt(x)},
+  POWER:(a,ev)=>{need(a,2,2,'POWER');return Math.pow(toNum(ev(a[0])),toNum(ev(a[1])))},
+  MOD:(a,ev)=>{need(a,2,2,'MOD');const x=toNum(ev(a[0])),d=toNum(ev(a[1]));if(d===0)fail('#DIV/0!');return x-d*Math.floor(x/d)},
+  IF:(a,ev)=>{need(a,2,3,'IF');if(toBool(ev(a[0])))return a[1].k==='blank'?0:ev(a[1]);return a.length>2?(a[2].k==='blank'?0:ev(a[2])):false},
+  IFS:(a,ev)=>{if(a.length%2)fail('#N/A','IFS needs condition/value pairs.');for(let i=0;i<a.length;i+=2)if(toBool(ev(a[i])))return ev(a[i+1]);fail('#N/A','None of the IFS conditions is TRUE.')},
+  AND:(a,ev)=>{let r=true;for(const x of a){const v=ev(x);const list=v instanceof Arr?v.flat().filter(y=>typeof y!=='string'&&y!==null):[v];for(const y of list)if(!toBool(y))r=false}return r},
+  OR:(a,ev)=>{let r=false;for(const x of a){const v=ev(x);const list=v instanceof Arr?v.flat().filter(y=>typeof y!=='string'&&y!==null):[v];for(const y of list)if(toBool(y))r=true}return r},
+  NOT:(a,ev)=>{need(a,1,1,'NOT');return !toBool(ev(a[0]))},
+  IFERROR:(a,ev)=>{need(a,2,2,'IFERROR');try{return ev(a[0])}catch(e){if(e instanceof XErr)return ev(a[1]);throw e}},
+  IFNA:(a,ev)=>{need(a,2,2,'IFNA');try{return ev(a[0])}catch(e){if(e instanceof XErr&&e.code==='#N/A')return ev(a[1]);throw e}},
+  ISERROR:(a,ev)=>{try{ev(a[0]);return false}catch(e){if(e instanceof XErr)return true;throw e}},
+  ISNUMBER:(a,ev)=>typeof one(ev(a[0]))==='number',
+  ISTEXT:(a,ev)=>typeof one(ev(a[0]))==='string',
+  ISBLANK:(a,ev)=>one(ev(a[0]))===null,
+  COUNTIF:(a,ev,rng)=>{need(a,2,2,'COUNTIF');const r=rng(a[0]),f=mkCrit(ev(a[1]));return r.flat().filter(f).length},
+  SUMIF:(a,ev,rng)=>{need(a,2,3,'SUMIF');const r=rng(a[0]),f=mkCrit(ev(a[1])),s=a[2]?rng(a[2]):r;let t=0;
+    r.rows.forEach((row,i)=>row.forEach((v,j)=>{if(f(v)){const x=(s.rows[i]||[])[j];if(typeof x==='number')t+=x}}));return t},
+  AVERAGEIF:(a,ev,rng)=>{need(a,2,3,'AVERAGEIF');const r=rng(a[0]),f=mkCrit(ev(a[1])),s=a[2]?rng(a[2]):r;let t=0,n=0;
+    r.rows.forEach((row,i)=>row.forEach((v,j)=>{if(f(v)){const x=(s.rows[i]||[])[j];if(typeof x==='number'){t+=x;n++}}}));if(!n)fail('#DIV/0!','No rows match the condition.');return t/n},
+  COUNTIFS:(a,ev,rng)=>{if(a.length<2)fail('#N/A','COUNTIFS needs at least one range and criteria.');const r=rng(a[0]),ok=pairsFilter(a,ev,rng,0,'COUNTIFS');let c=0;for(let i=0;i<r.h;i++)for(let j=0;j<r.w;j++)if(ok(i,j))c++;return c},
+  SUMIFS:(a,ev,rng)=>{if(a.length<3)fail('#N/A','SUMIFS needs a sum range, then range/criteria pairs.');const s=rng(a[0]),ok=pairsFilter(a,ev,rng,1,'SUMIFS');let t=0;for(let i=0;i<s.h;i++)for(let j=0;j<s.w;j++)if(ok(i,j)&&typeof s.rows[i][j]==='number')t+=s.rows[i][j];return t},
+  AVERAGEIFS:(a,ev,rng)=>{if(a.length<3)fail('#N/A');const s=rng(a[0]),ok=pairsFilter(a,ev,rng,1,'AVERAGEIFS');let t=0,n=0;for(let i=0;i<s.h;i++)for(let j=0;j<s.w;j++)if(ok(i,j)&&typeof s.rows[i][j]==='number'){t+=s.rows[i][j];n++}if(!n)fail('#DIV/0!','No rows match all conditions.');return t/n},
+  MAXIFS:(a,ev,rng)=>{if(a.length<3)fail('#N/A');const s=rng(a[0]),ok=pairsFilter(a,ev,rng,1,'MAXIFS');const n=[];for(let i=0;i<s.h;i++)for(let j=0;j<s.w;j++)if(ok(i,j)&&typeof s.rows[i][j]==='number')n.push(s.rows[i][j]);return n.length?Math.max(...n):0},
+  MINIFS:(a,ev,rng)=>{if(a.length<3)fail('#N/A');const s=rng(a[0]),ok=pairsFilter(a,ev,rng,1,'MINIFS');const n=[];for(let i=0;i<s.h;i++)for(let j=0;j<s.w;j++)if(ok(i,j)&&typeof s.rows[i][j]==='number')n.push(s.rows[i][j]);return n.length?Math.min(...n):0},
+  SUMPRODUCT:(a,ev)=>{const arrs=a.map(x=>{const v=ev(x);return v instanceof Arr?v:new Arr([[v]])});const h=arrs[0].h,w=arrs[0].w;
+    if(arrs.some(x=>x.h!==h||x.w!==w))fail('#VALUE!','All SUMPRODUCT ranges must be the same size.');let t=0;
+    for(let i=0;i<h;i++)for(let j=0;j<w;j++){let p=1;for(const x of arrs){let v=x.rows[i][j];if(typeof v==='boolean')v=v?1:0;p*=typeof v==='number'?v:0}t+=p}return t},
+  VLOOKUP:(a,ev,rng)=>{need(a,3,4,'VLOOKUP');const v=one(ev(a[0])),t=rng(a[1]),c=Math.trunc(toNum(ev(a[2])));
+    if(c<1||c>t.w)fail('#REF!','Column number '+c+' is outside the table, which has '+t.w+' columns.');
+    const exact=a.length>3&&a[3].k!=='blank'&&!toBool(ev(a[3]));
+    if(exact){for(const row of t.rows)if(lookEq(row[0],v))return row[c-1];fail('#N/A','"'+toStr(v)+'" is not in the first column of the table.')}
+    let hit=-1;t.rows.forEach((row,i)=>{if(row[0]!==null&&rank(row[0])===rank(v)&&cmp(row[0],v)<=0)hit=i});
+    if(hit<0)fail('#N/A','No match found.');return t.rows[hit][c-1]},
+  HLOOKUP:(a,ev,rng)=>{need(a,3,4,'HLOOKUP');const v=one(ev(a[0])),t=rng(a[1]),r=Math.trunc(toNum(ev(a[2])));
+    if(r<1||r>t.h)fail('#REF!','Row number is outside the table.');const exact=a.length>3&&a[3].k!=='blank'&&!toBool(ev(a[3]));
+    if(exact){for(let j=0;j<t.w;j++)if(lookEq(t.rows[0][j],v))return t.rows[r-1][j];fail('#N/A','No exact match found.')}
+    let hit=-1;for(let j=0;j<t.w;j++){const x=t.rows[0][j];if(x!==null&&rank(x)===rank(v)&&cmp(x,v)<=0)hit=j}if(hit<0)fail('#N/A');return t.rows[r-1][hit]},
+  MATCH:(a,ev,rng)=>{need(a,2,3,'MATCH');const v=one(ev(a[0])),r=rng(a[1]);if(r.h>1&&r.w>1)fail('#N/A','MATCH needs a single row or column.');
+    const list=r.flat(),type=a.length>2&&a[2].k!=='blank'?toNum(ev(a[2])):1;
+    if(type===0){const i=list.findIndex(x=>lookEq(x,v));if(i<0)fail('#N/A','"'+toStr(v)+'" was not found.');return i+1}
+    let hit=-1;list.forEach((x,i)=>{if(x!==null&&rank(x)===rank(v)&&(type>0?cmp(x,v)<=0:cmp(x,v)>=0))hit=i});if(hit<0)fail('#N/A');return hit+1},
+  INDEX:(a,ev,rng)=>{need(a,2,3,'INDEX');const t=rng(a[0]);let r=Math.trunc(toNum(ev(a[1]))),c=a.length>2&&a[2].k!=='blank'?Math.trunc(toNum(ev(a[2]))):null;
+    if(c===null){if(t.h===1){c=r;r=1}else c=1}
+    if(r<1||r>t.h||c<1||c>t.w)fail('#REF!','The row or column number is outside the range.');return t.rows[r-1][c-1]},
+  XLOOKUP:(a,ev,rng)=>{need(a,3,6,'XLOOKUP');const v=one(ev(a[0])),l=rng(a[1]),r=rng(a[2]);const list=l.flat();
+    const i=list.findIndex(x=>x!==null&&rank(x)===rank(v)&&cmp(x,v)===0);
+    if(i<0){if(a.length>3&&a[3].k!=='blank')return ev(a[3]);fail('#N/A','"'+toStr(v)+'" was not found.')}
+    if(r.w===1||r.h===1){const f=r.flat();if(f.length!==list.length)fail('#VALUE!','The lookup and return ranges must be the same size.');return f[i]}
+    return new Arr([r.rows[i]])},
+  LEFT:(a,ev)=>{need(a,1,2,'LEFT');const s=toStr(one(ev(a[0]))),n=a.length>1?toNum(ev(a[1])):1;if(n<0)fail('#VALUE!','LEFT cannot take a negative number of characters.');return s.slice(0,n)},
+  RIGHT:(a,ev)=>{need(a,1,2,'RIGHT');const s=toStr(one(ev(a[0]))),n=a.length>1?toNum(ev(a[1])):1;if(n<0)fail('#VALUE!','RIGHT cannot take a negative number of characters.');return n===0?'':s.slice(-n)},
+  MID:(a,ev)=>{need(a,3,3,'MID');const s=toStr(one(ev(a[0]))),st=toNum(ev(a[1])),n=toNum(ev(a[2]));if(st<1||n<0)fail('#VALUE!');return s.substr(st-1,n)},
+  LEN:(a,ev)=>{need(a,1,1,'LEN');return toStr(one(ev(a[0]))).length},
+  UPPER:(a,ev)=>{need(a,1,1,'UPPER');return toStr(one(ev(a[0]))).toUpperCase()},
+  LOWER:(a,ev)=>{need(a,1,1,'LOWER');return toStr(one(ev(a[0]))).toLowerCase()},
+  PROPER:(a,ev)=>{need(a,1,1,'PROPER');return toStr(one(ev(a[0]))).toLowerCase().replace(/(^|[^a-z])([a-z])/g,(m,p,c)=>p+c.toUpperCase())},
+  TRIM:(a,ev)=>{need(a,1,1,'TRIM');return toStr(one(ev(a[0]))).replace(/ +/g,' ').trim()},
+  FIND:(a,ev)=>{need(a,2,3,'FIND');const f=toStr(one(ev(a[0]))),s=toStr(one(ev(a[1]))),st=a.length>2?toNum(ev(a[2])):1;const i=s.indexOf(f,st-1);if(i<0)fail('#VALUE!','FIND could not find "'+f+'" in "'+s+'".');return i+1},
+  SEARCH:(a,ev)=>{need(a,2,3,'SEARCH');const f=toStr(one(ev(a[0]))).toLowerCase(),s=toStr(one(ev(a[1]))).toLowerCase(),st=a.length>2?toNum(ev(a[2])):1;const i=s.indexOf(f,st-1);if(i<0)fail('#VALUE!','SEARCH could not find "'+f+'".');return i+1},
+  SUBSTITUTE:(a,ev)=>{need(a,3,4,'SUBSTITUTE');const s=toStr(one(ev(a[0]))),o=toStr(one(ev(a[1]))),n=toStr(one(ev(a[2])));return o?s.split(o).join(n):s},
+  CONCAT:(a,ev)=>a.map(x=>{const v=ev(x);return v instanceof Arr?v.flat().map(toStr).join(''):toStr(v)}).join(''),
+  CONCATENATE:(a,ev)=>a.map(x=>toStr(one(ev(x)))).join(''),
+  TEXTJOIN:(a,ev)=>{const d=toStr(one(ev(a[0]))),ign=toBool(ev(a[1]));const parts=[];for(const x of a.slice(2)){const v=ev(x);for(const y of v instanceof Arr?v.flat():[v]){const s=toStr(y);if(!(ign&&s===''))parts.push(s)}}return parts.join(d)},
+  TEXTBEFORE:(a,ev)=>{const s=toStr(one(ev(a[0]))),d=toStr(one(ev(a[1])));const i=s.indexOf(d);if(i<0)fail('#N/A','The delimiter was not found.');return s.slice(0,i)},
+  TEXTAFTER:(a,ev)=>{const s=toStr(one(ev(a[0]))),d=toStr(one(ev(a[1])));const i=s.indexOf(d);if(i<0)fail('#N/A','The delimiter was not found.');return s.slice(i+d.length)},
+  VALUE:(a,ev)=>toNum(one(ev(a[0]))),
+};
+
+function evaluator(sheet,self){
+  const inside=(n)=>self&&self.c>=Math.min(n.c1,n.c2)&&self.c<=Math.max(n.c1,n.c2)&&self.r>=Math.min(n.r1,n.r2)&&self.r<=Math.max(n.r1,n.r2);
+  const rangeArr=n=>{const rows=[];for(let r=Math.min(n.r1,n.r2);r<=Math.max(n.r1,n.r2);r++){const row=[];for(let c=Math.min(n.c1,n.c2);c<=Math.max(n.c1,n.c2);c++)row.push(sheet(c,r));rows.push(row)}return new Arr(rows)};
+  function ev(n){
+    switch(n.k){
+      case 'num':case 'str':case 'bool':return n.v;
+      case 'blank':return null;
+      case 'ref':if(self&&n.c===self.c&&n.r===self.r)fail('CIRC','The formula refers to its own cell ('+aname(n.c,n.r)+'). That is a circular reference.');return sheet(n.c,n.r);
+      case 'range':if(inside(n))fail('CIRC','The range includes the answer cell itself. That is a circular reference.');return rangeArr(n);
+      case 'neg':return bcast(ev(n.a),0,x=>-toNum(x));
+      case 'pct':return bcast(ev(n.a),0,x=>toNum(x)/100);
+      case 'bin':return binop(n.op,ev(n.a),ev(n.b));
+      case 'call':{const f=FN[n.name];if(!f)fail('#NAME?','There is no function called '+n.name+' in this trainer. Check the spelling.');return f(n.args,ev,rng)}
+    }
+  }
+  function rng(n){if(n.k==='ref')return new Arr([[ev(n)]]);const v=ev(n);if(v instanceof Arr)return v;fail('#VALUE!','This argument must be a range of cells, like B2:B13.')}
+  return ev;
+}
+function shift(n,dr){
+  if(!dr||!n||typeof n!=='object')return n;
+  if(n.k==='ref')return{...n,r:n.ar?n.r:n.r+dr};
+  if(n.k==='range')return{...n,r1:n.ar1?n.r1:n.r1+dr,r2:n.ar2?n.r2:n.r2+dr};
+  const o={...n};if(n.a)o.a=shift(n.a,dr);if(n.b)o.b=shift(n.b,dr);if(n.args)o.args=n.args.map(x=>shift(x,dr));return o;
+}
+function walk(n,f){if(!n)return;f(n);if(n.a)walk(n.a,f);if(n.b)walk(n.b,f);if(n.args)n.args.forEach(x=>walk(x,f))}
+
+/* ================= Data and exercises ================= */
+const ORDERS=[
+  [1001,'East','Anna Lee','Laptop',3,1200],[1002,'West','Mark Diaz','Monitor',5,250],[1003,'North','Sara Kim','Mouse',20,25],
+  [1004,'East','Anna Lee','Keyboard',10,45],[1005,'South','Tom Reed','Laptop',2,1200],[1006,'West','Mark Diaz','Laptop',4,1200],
+  [1007,'East','John Park','Monitor',8,250],[1008,'North','Sara Kim','Laptop',5,1200],[1009,'South','Tom Reed','Mouse',15,25],
+  [1010,'East','John Park','Laptop',1,1200],[1011,'West','Lisa Wong','Keyboard',6,45],[1012,'South','Lisa Wong','Monitor',3,250]];
+const PRODUCTS=[['Laptop','Computers',14],['Monitor','Displays',22],['Mouse','Accessories',120],['Keyboard','Accessories',75],['Headset','Audio',0]];
+const CELLS={};
+['Order ID','Region','Rep','Product','Units','Unit price','Revenue','Answer'].forEach((h,i)=>CELLS[aname(i,1)]=h);
+ORDERS.forEach((o,k)=>{[...o,o[4]*o[5]].forEach((v,i)=>CELLS[aname(i,k+2)]=v)});
+['Product','Category','In stock'].forEach((h,i)=>CELLS[aname(9+i,1)]=h);
+PRODUCTS.forEach((p,k)=>p.forEach((v,i)=>CELLS[aname(9+i,k+2)]=v));
+const getCell=(c,r)=>{const v=CELLS[aname(c,r)];return v===undefined?null:v};
+const NCOLS=12,NROWS=14;
+
+const SECTIONS={basics:'Basics',logic:'Logic',cond:'Conditional sums & counts',lookup:'Lookups',text:'Text',adv:'Interview classics'};
+const TASKS=[
+  {id:'sum',sec:'basics',title:'Total revenue',target:'H2',prompt:'Add up all revenue in column G. Put the result in <b>H2</b>.',solution:'=SUM(G2:G13)',require:[['SUM']],syntax:'SUM(number1, [number2], …)',hint:'Select the whole Revenue column from G2 to G13 inside SUM().'},
+  {id:'avg',sec:'basics',title:'Average units',target:'H2',prompt:'What is the average number of units per order? Use column E.',solution:'=AVERAGE(E2:E13)',require:[['AVERAGE']],syntax:'AVERAGE(number1, [number2], …)',hint:'AVERAGE works like SUM: give it the range E2:E13.'},
+  {id:'max',sec:'basics',title:'Largest order',target:'H2',prompt:'Find the highest revenue of a single order.',solution:'=MAX(G2:G13)',require:[['MAX']],syntax:'MAX(number1, [number2], …)',hint:'MAX returns the biggest number in a range.'},
+  {id:'min',sec:'basics',title:'Cheapest product price',target:'H2',prompt:'Find the lowest unit price in column F.',solution:'=MIN(F2:F13)',require:[['MIN']],syntax:'MIN(number1, [number2], …)',hint:'MIN is the opposite of MAX.'},
+  {id:'count',sec:'basics',title:'Number of orders',target:'H2',prompt:'Count how many orders there are, using the Order ID column.',solution:'=COUNT(A2:A13)',require:[['COUNT','COUNTA']],syntax:'COUNT(value1, …) counts numbers. COUNTA counts any filled cell.',hint:'Order IDs are numbers, so COUNT(A2:A13) works.'},
+  {id:'mult',sec:'basics',title:'Revenue by hand',target:'H5',prompt:'Calculate the revenue of order 1004 (row 5): units times unit price. Do not use column G.',solution:'=E5*F5',refs:['E5','F5'],syntax:'Use the * operator, like =A1*B1',hint:'Multiply the Units cell by the Unit price cell on the same row.'},
+  {id:'round',sec:'basics',title:'Round the average',target:'H2',prompt:'Find the average revenue per order, rounded to whole dollars.',solution:'=ROUND(AVERAGE(G2:G13),0)',require:[['ROUND'],['AVERAGE']],syntax:'ROUND(number, num_digits)',hint:'Put AVERAGE(G2:G13) inside ROUND, and use 0 digits.'},
+
+  {id:'if',sec:'logic',title:'Big or small order',target:'H2',prompt:'In <b>H2</b>, show "Big" if the revenue of order 1001 is 2000 or more, otherwise "Small".',solution:'=IF(G2>=2000,"Big","Small")',require:[['IF']],refs:['G2'],syntax:'IF(logical_test, value_if_true, value_if_false)',hint:'The test is G2>=2000. Text answers go in double quotes.'},
+  {id:'if2',sec:'logic',title:'Bulk orders',target:'H4',prompt:'In <b>H4</b>, show "Bulk" if order 1003 has 10 or more units, otherwise "Standard".',solution:'=IF(E4>=10,"Bulk","Standard")',require:[['IF']],refs:['E4'],syntax:'IF(logical_test, value_if_true, value_if_false)',hint:'Units are in column E. Test E4>=10.'},
+  {id:'and',sec:'logic',title:'East and over 1,500',target:'H8',prompt:'In <b>H8</b>, return TRUE if order 1007 is from the East region <em>and</em> its revenue is above 1500.',solution:'=AND(B8="East",G8>1500)',require:[['AND']],refs:['B8','G8'],syntax:'AND(logical1, [logical2], …)',hint:'Two tests inside AND: B8="East" and G8>1500.'},
+  {id:'or',sec:'logic',title:'Flag for review',target:'H10',prompt:'In <b>H10</b>, show "Check" if order 1009 has more than 12 units <em>or</em> revenue under 400. Otherwise show an empty text "".',solution:'=IF(OR(E10>12,G10<400),"Check","")',require:[['IF'],['OR']],refs:['E10','G10'],syntax:'IF(OR(test1, test2), "Check", "")',hint:'Put OR(E10>12, G10<400) as the first argument of IF.'},
+  {id:'comm',sec:'logic',title:'Sales commission',target:'H7',prompt:'Reps earn 5% commission on an order only if its revenue is over 2000. Calculate the commission for order 1006 in <b>H7</b>, or 0 if it does not qualify.',solution:'=IF(G7>2000,G7*5%,0)',require:[['IF']],refs:['G7'],syntax:'IF(test, G7*5%, 0)',hint:'5% can be written as 5% or 0.05.'},
+
+  {id:'countif',sec:'cond',title:'Orders from East',target:'H2',prompt:'How many orders came from the East region?',solution:'=COUNTIF(B2:B13,"East")',require:[['COUNTIF','COUNTIFS']],syntax:'COUNTIF(range, criteria)',hint:'Range is the Region column B2:B13, criteria is "East".'},
+  {id:'sumif',sec:'cond',title:'Revenue from West',target:'H2',prompt:'What is the total revenue of all West orders?',solution:'=SUMIF(B2:B13,"West",G2:G13)',require:[['SUMIF','SUMIFS']],syntax:'SUMIF(range, criteria, [sum_range])',hint:'Check region in B2:B13, add up G2:G13.'},
+  {id:'countgt',sec:'cond',title:'Orders over 1,000',target:'H2',prompt:'Count the orders with revenue greater than 1000.',solution:'=COUNTIF(G2:G13,">1000")',require:[['COUNTIF','COUNTIFS']],syntax:'COUNTIF(range, ">1000")',hint:'Comparison criteria go in quotes: ">1000".'},
+  {id:'avgif',sec:'cond',title:'Average laptop order',target:'H2',prompt:'What is the average number of units in Laptop orders?',solution:'=AVERAGEIF(D2:D13,"Laptop",E2:E13)',require:[['AVERAGEIF','AVERAGEIFS']],syntax:'AVERAGEIF(range, criteria, [average_range])',hint:'Same shape as SUMIF: check D, average E.'},
+  {id:'sumifs',sec:'cond',title:'East laptops',target:'H2',prompt:'Total revenue from Laptop orders in the East region.',solution:'=SUMIFS(G2:G13,B2:B13,"East",D2:D13,"Laptop")',require:[['SUMIFS']],syntax:'SUMIFS(sum_range, range1, criteria1, range2, criteria2, …)',hint:'In SUMIFS the sum range comes first: G2:G13.'},
+  {id:'countifs',sec:'cond',title:'Bigger laptop orders',target:'H2',prompt:'Count Laptop orders with 3 or more units.',solution:'=COUNTIFS(D2:D13,"Laptop",E2:E13,">=3")',require:[['COUNTIFS']],syntax:'COUNTIFS(range1, criteria1, range2, criteria2, …)',hint:'Two pairs: Product = "Laptop" and Units ">=3".'},
+  {id:'maxifs',sec:'cond',title:'Best South order',target:'H2',prompt:'What is the largest single-order revenue in the South region?',solution:'=MAXIFS(G2:G13,B2:B13,"South")',require:[['MAXIFS']],syntax:'MAXIFS(max_range, range1, criteria1, …)',hint:'MAXIFS works like SUMIFS, but returns the maximum.'},
+
+  {id:'vlookup',sec:'lookup',title:'Product category',target:'H2',prompt:'Look up the category of the product in <b>D2</b> using the product list in J2:L6.',solution:'=VLOOKUP(D2,J2:L6,2,FALSE)',require:[['VLOOKUP']],refs:['D2'],syntax:'VLOOKUP(lookup_value, table_array, col_index_num, [range_lookup])',hint:'Category is the 2nd column of J2:L6. Use FALSE for an exact match.'},
+  {id:'indexmatch',sec:'lookup',title:'Stock with INDEX/MATCH',target:'H4',prompt:'How many units of the product in <b>D4</b> are in stock? Use INDEX and MATCH on the product list.',solution:'=INDEX(L2:L6,MATCH(D4,J2:J6,0))',require:[['INDEX'],['MATCH']],refs:['D4'],syntax:'INDEX(return_range, MATCH(lookup_value, lookup_range, 0))',hint:'MATCH finds the position of D4 in J2:J6, INDEX takes that position from L2:L6.'},
+  {id:'xlookup',sec:'lookup',title:'Stock with XLOOKUP',target:'H3',prompt:'Return the stock level for the product in <b>D3</b> with XLOOKUP.',solution:'=XLOOKUP(D3,J2:J6,L2:L6)',require:[['XLOOKUP']],refs:['D3'],syntax:'XLOOKUP(lookup_value, lookup_array, return_array, [if_not_found])',hint:'Look for D3 in J2:J6 and return from L2:L6.'},
+  {id:'iferror',sec:'lookup',title:'Missing product',target:'H2',prompt:'Look up the category of "Tablet" in the product list. It is not there, so show "Not found" instead of an error.',solution:'=IFERROR(VLOOKUP("Tablet",J2:L6,2,FALSE),"Not found")',require:[['IFERROR']],syntax:'IFERROR(value, value_if_error)',hint:'Wrap a normal VLOOKUP in IFERROR(…, "Not found").'},
+  {id:'match',sec:'lookup',title:'Position in list',target:'H2',prompt:'In which position of the product list (J2:J6) is "Mouse"?',solution:'=MATCH("Mouse",J2:J6,0)',require:[['MATCH']],syntax:'MATCH(lookup_value, lookup_array, [match_type])',hint:'Use 0 as the last argument for an exact match.'},
+
+  {id:'first',sec:'text',title:'First name',target:'H2',prompt:'Extract the first name from the rep name in <b>C2</b>. The formula should work for any name, so do not count letters by hand.',solution:'=LEFT(C2,FIND(" ",C2)-1)',require:[['LEFT','TEXTBEFORE']],refs:['C2'],syntax:'LEFT(text, FIND(" ", text) - 1)',hint:'FIND(" ",C2) gives the position of the space. Take one character less.'},
+  {id:'code',sec:'text',title:'Order code',target:'H2',prompt:'Build an order code like <code>EAST-1001</code> from the region in <b>B2</b> and the order ID in <b>A2</b>.',solution:'=UPPER(B2)&"-"&A2',require:[['UPPER']],refs:['B2','A2'],syntax:'UPPER(text) & "-" & cell',hint:'The & sign joins text. UPPER makes the region capital.'},
+  {id:'last',sec:'text',title:'Last name',target:'H6',prompt:'Extract the last name from the rep name in <b>C6</b>.',solution:'=RIGHT(C6,LEN(C6)-FIND(" ",C6))',require:[['RIGHT','MID','TEXTAFTER']],refs:['C6'],syntax:'RIGHT(text, LEN(text) - FIND(" ", text))',hint:'Length of the name minus the position of the space = length of the last name.'},
+
+  {id:'sumproduct',sec:'adv',title:'Revenue with SUMPRODUCT',target:'H2',prompt:'Calculate total revenue from Units (E) and Unit price (F) in one formula, without using column G.',solution:'=SUMPRODUCT(E2:E13,F2:F13)',require:[['SUMPRODUCT']],refs:['E2','F2'],syntax:'SUMPRODUCT(array1, array2)',hint:'SUMPRODUCT multiplies row by row and adds the results.'},
+  {id:'abs',sec:'adv',title:'Share of total ($ signs)',target:'H2',fill:12,prompt:'In <b>H2</b>, write each order’s share of total revenue as a decimal (e.g. 0.12). The formula must still be right when copied down to H13.',solution:'=G2/SUM($G$2:$G$13)',refs:['G2'],syntax:'cell / SUM($G$2:$G$13)',hint:'Lock the total range with $ signs so it does not move when copied: $G$2:$G$13.'}
+];
+TASKS.forEach(t=>{t.solAst=parse(t.solution.slice(1))});
+const TOPIC=window.PAGE_TOPIC||null;
+const VIS=TOPIC?TASKS.filter(t=>TOPIC.includes(t.sec)):TASKS;
+
+/* ================= Checking ================= */
+function run(ast,cell){try{let v=evaluator(getCell,cell)(ast);if(v instanceof Arr&&v.h===1&&v.w===1)v=v.rows[0][0];return{v}}catch(e){if(e instanceof XErr)return{err:e};throw e}}
+function fmtVal(v){if(v instanceof Arr)return'an array of values';if(v===null)return '0';if(typeof v==='number')return fmtNum(Number(v.toFixed(10)));if(typeof v==='boolean')return v?'TRUE':'FALSE';return v===''?'empty text':'"'+v+'"'}
+function same(u,s){
+  if(u instanceof Arr)return{ok:false,hint:' It returns several values at once. This exercise needs one value.'};
+  if(u===null)u=typeof s==='string'?'':0;
+  if(typeof s==='number')return{ok:typeof u==='number'&&Math.abs(u-s)<=1e-9*Math.max(1,Math.abs(s))};
+  if(typeof s==='string'){if(u===s)return{ok:true};if(typeof u==='string'&&u.toLowerCase()===s.toLowerCase())return{ok:false,hint:' Almost: check the capital letters.'};if(typeof u==='string'&&u.trim()===s)return{ok:false,hint:' Almost: there are extra spaces.'};return{ok:false}}
+  return{ok:u===s};
+}
+function errText(e){const m={'#DIV/0!':'#DIV/0!','#N/A':'#N/A','#VALUE!':'#VALUE!','#REF!':'#REF!','#NAME?':'#NAME?','#NUM!':'#NUM!'};return (m[e.code]?'Excel would show '+e.code+'. ':'')+e.msg}
+function check(task,formula){
+  let src=(formula||'').trim();
+  if(!src)return{status:'empty',msg:'Type a formula first. Formulas start with =, like =SUM(A2:A5).'};
+  if(src[0]!=='='&&src[0]!=='+')return{status:'error',msg:'Formulas start with an equals sign. Without it Excel treats the cell as plain text.'};
+  src=src.replace(/^[=+]\s*/,'');
+  let ast;try{ast=parse(src)}catch(e){return{status:'error',msg:e.message}}
+  const t=addr(task.target),n=task.fill||1,values=[];
+  for(let dr=0;dr<n;dr++){
+    const cell={c:t.c,r:t.r+dr},u=run(shift(ast,dr),cell),s=run(shift(task.solAst,dr),cell);
+    if(u.err)return{status:'error',msg:errText(u.err)+(dr?' (after copying to '+aname(cell.c,cell.r)+')':''),values};
+    const eq=same(u.v,s.v);values.push(u.v);
+    if(!eq.ok){
+      if(dr)return{status:'wrong',msg:'Right in '+task.target+', but copied down to '+aname(cell.c,cell.r)+' it gives '+fmtVal(u.v)+'. Something moved that should stay fixed.',values};
+      return{status:'wrong',msg:'Your formula returns '+fmtVal(u.v)+'. That is not the expected answer yet.'+(eq.hint||''),values};
+    }
+  }
+  const refs=[],fns=new Set();walk(ast,x=>{if(x.k==='ref'||x.k==='range')refs.push(x);if(x.k==='call')fns.add(x.name)});
+  if(!refs.length)return{status:'warn',msg:'The value is right, but the formula has no cell references. In a real test it would break as soon as the data changes.',values};
+  for(const req of task.require||[])if(!req.some(f=>fns.has(f)))return{status:'warn',msg:'Correct value! This exercise trains '+req.join(' or ')+', so try it with that function.',values};
+  const covers=(name)=>{const a=addr(name);return refs.some(x=>x.k==='ref'?x.c===a.c&&x.r===a.r:a.c>=Math.min(x.c1,x.c2)&&a.c<=Math.max(x.c1,x.c2)&&a.r>=Math.min(x.r1,x.r2)&&a.r<=Math.max(x.r1,x.r2))};
+  for(const r of task.refs||[])if(!covers(r))return{status:'warn',msg:'Correct value, but refer to cell '+r+' instead of typing its value. That way the formula updates when the data changes.',values};
+  return{status:'ok',msg:'Correct! '+(n>1?'Works in all 12 rows.':'Result: '+fmtVal(values[0])+'.'),values};
+}
+
+/* ================= UI ================= */
+const $=id=>document.getElementById(id);
+const store={get(){try{return JSON.parse(localStorage.getItem('xlp_v1'))||{}}catch(e){return{}}},set(v){try{localStorage.setItem('xlp_v1',JSON.stringify(v))}catch(e){}}};
+const saved=store.get();
+const state={solved:saved.solved||{},drafts:{},cur:saved.cur&&VIS.some(t=>t.id===saved.cur)?saved.cur:VIS[0].id,mode:'practice',mock:null,shown:null};
+const persist=()=>store.set({solved:state.solved,cur:state.cur});
+const task=()=>TASKS.find(t=>t.id===state.cur);
+const fx=$('fx');let caret=null;
+
+function buildSheet(){
+  const tb=$('sheet');let h='<thead><tr><th></th>';
+  for(let c=0;c<NCOLS;c++)h+='<th scope="col">'+colName(c)+'</th>';
+  h+='</tr></thead><tbody>';
+  for(let r=1;r<=NROWS;r++){h+='<tr><th scope="row">'+r+'</th>';
+    for(let c=0;c<NCOLS;c++){const v=getCell(c,r);const cls=[];if(c===8)cls.push('gap');else{if(r===1&&v!==null)cls.push('hdr');if(typeof v==='number')cls.push('num')}
+      h+='<td data-c="'+c+'" data-r="'+r+'" class="'+cls.join(' ')+'">'+(c===8||v===null?'':esc(String(v)))+'</td>'}
+    h+='</tr>'}
+  tb.innerHTML=h+'</tbody>';
+}
+const esc=s=>s.replace(/[&<>"]/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[ch]));
+const td=(c,r)=>$('sheet').querySelector('td[data-c="'+c+'"][data-r="'+r+'"]');
+
+function paintSheet(values){
+  document.querySelectorAll('#sheet td.target,#sheet td.result').forEach(el=>{el.classList.remove('target','result');const c=+el.dataset.c,r=+el.dataset.r;const v=getCell(c,r);el.textContent=v===null?'':String(v);el.classList.toggle('num',typeof v==='number')});
+  const t=task(),a=addr(t.target),n=t.fill||1;
+  for(let i=0;i<n;i++){const el=td(a.c,a.r+i);if(!el)continue;el.classList.add(i?'result':'target');
+    const v=values&&values[i]!==undefined?values[i]:undefined;el.textContent=v===undefined?(i?'':'?'):(v instanceof Arr?'{…}':fmtVal(v).replace(/^"|"$/g,'').replace('empty text',''));el.classList.toggle('num',typeof v==='number')}
+}
+function highlightRefs(){
+  document.querySelectorAll('#sheet td.h1,#sheet td.h2,#sheet td.h3,#sheet td.h4').forEach(el=>el.classList.remove('h1','h2','h3','h4'));
+  let src=fx.value.trim().replace(/^[=+]/,'');if(!src)return;let toks;try{toks=tokenize(src)}catch(e){return}
+  let k=0;for(const t of toks){if(t.t!=='ref'&&t.t!=='range')continue;const cls='h'+(k++%4+1);
+    const c1=t.t==='ref'?t.c:Math.min(t.c1,t.c2),c2=t.t==='ref'?t.c:Math.max(t.c1,t.c2),r1=t.t==='ref'?t.r:Math.min(t.r1,t.r2),r2=t.t==='ref'?t.r:Math.max(t.r1,t.r2);
+    for(let c=c1;c<=c2&&c<NCOLS;c++)for(let r=r1;r<=r2&&r<=NROWS;r++){const el=td(c,r);if(el)el.classList.add(cls)}}
+}
+function feedback(kind,html){const f=$('feedback');f.className='feedback '+kind;f.innerHTML=html}
+
+function renderList(){
+  const n=Object.keys(state.solved).filter(id=>VIS.some(t=>t.id===id)).length;
+  $('prog-text').textContent=n+' / '+VIS.length+' solved';$('prog-bar').style.width=(100*n/VIS.length)+'%';
+  let h='';for(const s of Object.keys(SECTIONS).filter(k=>VIS.some(t=>t.sec===k))){h+='<div class="sec">'+SECTIONS[s]+'</div><ol>';
+    for(const t of VIS.filter(x=>x.sec===s))h+='<li><button type="button" data-id="'+t.id+'" aria-current="'+(t.id===state.cur)+'"><span class="tick">'+(state.solved[t.id]?'✓':'')+'</span><span>'+esc(t.title)+'</span></button></li>';
+    h+='</ol>'}
+  $('task-list').innerHTML=h;
+}
+function renderTask(){
+  const t=task(),i=VIS.indexOf(t);
+  $('task-title').textContent=t.title;
+  $('task-prompt').innerHTML=t.prompt.includes('<b>')?t.prompt:t.prompt+' Answer in <b>'+t.target+'</b>.';
+  $('cellname').textContent=t.target;
+  if(state.mode==='mock'){$('task-meta').textContent='';$('task-syntax').textContent=''}
+  else{$('task-meta').textContent=SECTIONS[t.sec]+' · '+(i+1)+' of '+VIS.length;$('task-syntax').textContent='Syntax: '+t.syntax}
+  fx.value=state.drafts[t.id]||'';fx.placeholder=state.mode==='mock'?'=':'= type your formula';
+  highlightRefs();
+  const done=state.mode==='practice'&&state.solved[t.id];
+  if(done){const r=check(t,fx.value||state.solved[t.id]);paintSheet(r.values);if(!fx.value)fx.value=state.solved[t.id];highlightRefs();feedback('ok','Solved. Your formula: <code>'+esc(state.solved[t.id])+'</code>')}
+  else{paintSheet(null);feedback('info','Type a formula starting with <code>=</code> and press Enter. Click or drag over cells to insert references.')}
+  state.shown=null;
+}
+function select(id){state.drafts[state.cur]=fx.value;state.cur=id;persist();renderList();renderTask()}
+function doCheck(){
+  const t=task(),r=check(t,fx.value);paintSheet(r.values&&r.values.length?r.values:null);
+  const kind={ok:'ok',warn:'warn',wrong:'bad',error:'bad',empty:'info'}[r.status];
+  feedback(kind,esc(r.msg));
+  if(r.status==='ok'){state.solved[t.id]=fx.value.trim();persist();renderList()}
+}
+function nextTask(){const i=VIS.findIndex(t=>t.id===state.cur);const after=VIS.slice(i+1).concat(VIS.slice(0,i+1));const n=after.find(t=>!state.solved[t.id])||VIS[(i+1)%VIS.length];select(n.id);fx.focus({preventScroll:true})}
+
+/* Mock test */
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function pick(sec,k){return shuffle(TASKS.filter(t=>sec.includes(t.sec))).slice(0,k)}
+function startMock(){
+  const ids=[...pick(['basics'],2),...pick(['logic'],2),...pick(['cond'],3),...pick(['lookup'],2),...pick(['text','adv'],1)].map(t=>t.id);
+  state.mock={ids,i:0,answers:{},ends:Date.now()+15*60*1000,timer:null};
+  state.mock.timer=setInterval(tick,500);tick();showMockQ();
+}
+function tick(){const m=state.mock;if(!m)return;const left=Math.max(0,m.ends-Date.now());const s=Math.ceil(left/1000);
+  $('timer').textContent=String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0');$('timer').classList.toggle('low',s<=60);if(left<=0)finishMock()}
+function showMockQ(){const m=state.mock;state.cur=m.ids[m.i];$('mock-pos').textContent='Question '+(m.i+1)+' of '+m.ids.length;renderTask();
+  feedback('info','Write the formula and press Submit. You cannot go back to earlier questions.');$('btn-check').textContent=m.i===m.ids.length-1?'Submit and finish':'Submit answer'}
+function submitMock(skip){const m=state.mock,t=task();m.answers[t.id]={formula:skip?'':fx.value.trim(),status:skip?'skipped':check(t,fx.value).status};
+  if(m.i<m.ids.length-1){m.i++;showMockQ()}else finishMock()}
+function finishMock(){
+  const m=state.mock;if(!m)return;clearInterval(m.timer);
+  const right=m.ids.filter(id=>m.answers[id]&&m.answers[id].status==='ok').length;
+  let h='<div class="score">'+right+' / '+m.ids.length+'</div><p class="meta">'+(right>=8?'Strong result. You are ready for a typical Excel screening test.':right>=5?'Solid base. Practise the topics you missed, then try again.':'Keep practising. Start with the topics below, one at a time.')+'</p><ol>';
+  for(const id of m.ids){const t=TASKS.find(x=>x.id===id),a=m.answers[id]||{formula:'',status:'skipped'};
+    h+='<li><strong>'+(a.status==='ok'?'✓ ':'✗ ')+esc(t.title)+'</strong><div class="sol">Yours: '+(a.formula?esc(a.formula):'(no answer)')+'</div><div class="sol">Model answer: '+esc(t.solution)+'</div></li>'}
+  h+='</ol><div class="actions" style="margin-top:12px"><button class="btn primary" type="button" id="btn-again">Take another test</button><button class="btn" type="button" id="btn-back">Back to practice</button></div>';
+  state.mock=null;$('results').innerHTML=h;$('results').hidden=false;
+  for(const id of ['task-card','editor','actions','feedback','mockbar'])$(id).hidden=true;
+  $('btn-again').onclick=()=>{$('results').hidden=true;setMode('mock')};$('btn-back').onclick=()=>setMode('practice');
+}
+function setMode(mode){
+  if(state.mock){clearInterval(state.mock.timer);state.mock=null}
+  state.mode=mode;$('mode-practice').setAttribute('aria-pressed',mode==='practice');$('mode-mock').setAttribute('aria-pressed',mode==='mock');
+  $('results').hidden=true;for(const id of ['task-card','editor','actions','feedback'])$(id).hidden=false;
+  $('mockbar').hidden=mode!=='mock';$('tasks').hidden=mode==='mock';
+  $('btn-hint').hidden=$('btn-solution').hidden=mode==='mock';$('btn-next').textContent=mode==='mock'?'Skip':'Next exercise →';
+  if(mode==='mock'){state.drafts={};startMock()}else{$('btn-check').textContent='Check';state.cur=VIS.some(t=>t.id===state.cur)?state.cur:VIS[0].id;renderList();renderTask()}
+}
+
+/* Cell picking: click a cell or drag across a range to insert it into the formula */
+let drag=null;
+function cellFrom(el){el=el&&el.closest?el.closest('td[data-c]'):null;return el&&!el.classList.contains('gap')?{c:+el.dataset.c,r:+el.dataset.r}:null}
+function markSel(a,b){document.querySelectorAll('#sheet td.sel').forEach(el=>el.classList.remove('sel'));if(!a)return;
+  for(let c=Math.min(a.c,b.c);c<=Math.max(a.c,b.c);c++)for(let r=Math.min(a.r,b.r);r<=Math.max(a.r,b.r);r++){const el=td(c,r);if(el)el.classList.add('sel')}}
+$('sheet').addEventListener('pointerdown',e=>{const c=cellFrom(e.target);if(!c)return;e.preventDefault();drag={a:c,b:c,moved:false};markSel(c,c)});
+document.addEventListener('pointermove',e=>{if(!drag)return;const c=cellFrom(document.elementFromPoint(e.clientX,e.clientY));if(c&&(c.c!==drag.b.c||c.r!==drag.b.r)){drag.b=c;drag.moved=true;markSel(drag.a,c)}});
+document.addEventListener('pointerup',()=>{if(!drag)return;const {a,b}=drag;drag=null;markSel(null);
+  const ref=a.c===b.c&&a.r===b.r?aname(a.c,a.r):aname(Math.min(a.c,b.c),Math.min(a.r,b.r))+':'+aname(Math.max(a.c,b.c),Math.max(a.r,b.r));
+  let v=fx.value;const pos=caret!==null&&caret<=v.length?caret:v.length;if(!v){v='=';}
+  const p=v===fx.value?pos:1;fx.value=v.slice(0,p)+ref+v.slice(p);caret=p+ref.length;
+  state.drafts[state.cur]=fx.value;highlightRefs();fx.focus({preventScroll:true});try{fx.setSelectionRange(caret,caret)}catch(e){}});
+document.addEventListener('pointercancel',()=>{drag=null;markSel(null)});
+['keyup','click','select','input'].forEach(ev=>fx.addEventListener(ev,()=>{caret=fx.selectionStart}));
+fx.addEventListener('input',()=>{state.drafts[state.cur]=fx.value;highlightRefs()});
+fx.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();state.mode==='mock'?submitMock(false):doCheck()}});
+
+$('btn-check').onclick=()=>state.mode==='mock'?submitMock(false):doCheck();
+$('btn-next').onclick=()=>state.mode==='mock'?submitMock(true):nextTask();
+$('btn-hint').onclick=()=>feedback('info','Hint: '+esc(task().hint));
+$('btn-solution').onclick=()=>{const t=task();feedback('info','One possible answer: <code>'+esc(t.solution)+'</code>. Type it in yourself and press Check to mark it solved.')};
+$('task-list').addEventListener('click',e=>{const b=e.target.closest('button[data-id]');if(b)select(b.dataset.id)});
+$('mode-practice').onclick=()=>setMode('practice');$('mode-mock').onclick=()=>{if(TOPIC){location.href='./#mock';return}setMode('mock')};
+
+buildSheet();renderList();renderTask();
+if(!TOPIC&&location.hash==='#mock')setMode('mock');
+window.__selfTest=()=>TASKS.map(t=>[t.id,check(t,t.solution).status]).filter(x=>x[1]!=='ok');
+</script>
+</html>
