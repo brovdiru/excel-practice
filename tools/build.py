@@ -1,7 +1,16 @@
 """Builds the static site from src/app.html. Run: python3 tools/build.py"""
 import re, pathlib, datetime
 ROOT = pathlib.Path(__file__).resolve().parent.parent
-BASE = "https://brovdiru.github.io/excel-practice/"
+# Site name and address. After a custom domain is connected, GitHub Pages adds a CNAME file
+# and the build uses that domain for canonical URLs and the sitemap automatically.
+SITE_NAME = "Job Test Drills"
+CNAME = ROOT / "CNAME"
+BASE = f"https://{CNAME.read_text().strip()}/" if CNAME.exists() else "https://brovdiru.github.io/excel-practice/"
+EXCEL = "excel/"
+# Excel pages used to live at the site root. These stubs keep old links and search results working.
+MOVED = ["indeed-excel-assessment-practice.html", "kenexa-excel-test-practice.html", "testgorilla-excel-test-practice.html",
+         "vlookup-practice.html", "sumif-countif-practice.html", "if-function-practice.html",
+         "excel-text-functions-practice.html", "excel-basic-formulas-practice.html"]
 SRC = (ROOT / "src/app.html").read_text()
 TODAY = datetime.date.today().isoformat()
 
@@ -106,9 +115,12 @@ def nav(cur):
     return f'<h2>More practice</h2><ul><li><a href="./">All 29 exercises and the mock interview test</a></li>{items}</ul>'
 
 HEAD = '<!doctype html>\n<html lang="en">\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">\n'
+(ROOT / EXCEL).mkdir(exist_ok=True)
+CRUMBS = ('<div class="wrap">\n  <nav class="crumbs" style="padding-top:14px;font-size:.85rem">'
+          f'<a href="../" style="color:var(--accent)">{SITE_NAME}</a> <span style="color:var(--muted)">/ Excel</span></nav>\n')
 for p in PAGES:
-    html = SRC
-    url = BASE + ("" if p["file"] == "index.html" else p["file"])
+    html = SRC.replace('<div class="wrap">\n', CRUMBS, 1)
+    url = BASE + EXCEL + ("" if p["file"] == "index.html" else p["file"])
     html = re.sub(r"<title>.*?</title>", f"<title>{p['title']}</title>", html, count=1)
     if p["desc"]:
         html = re.sub(r'<meta name="description" content="[^"]*">', f'<meta name="description" content="{p["desc"]}">', html, count=1)
@@ -118,10 +130,31 @@ for p in PAGES:
         html = html.replace("<script>\n/* ================= Formula engine", f"<script>window.PAGE_TOPIC={p['topic']!r};</script>\n<script>\n/* ================= Formula engine".replace("'", '"'), 1)
     else:
         html = html.replace("</article>", nav("index.html") + "</article>", 1)
-    html = html.replace("<footer>", '<footer><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · ', 1)
-    (ROOT / p["file"]).write_text(HEAD + f'<link rel="canonical" href="{url}">\n' + html + "</html>\n")
+    html = html.replace("<footer>", '<footer><a href="../about.html">About</a> · <a href="../privacy.html">Privacy</a> · ', 1)
+    (ROOT / EXCEL / p["file"]).write_text(HEAD + f'<link rel="canonical" href="{url}">\n' + html + "</html>\n")
 
-urls = [BASE + ("" if p["file"] == "index.html" else p["file"]) for p in PAGES] + [BASE + "about.html", BASE + "privacy.html"]
+# Hub home page
+hub = (ROOT / "src/hub.html").read_text().replace("{SITE_NAME}", SITE_NAME)
+(ROOT / "index.html").write_text(HEAD + f'<link rel="canonical" href="{BASE}">\n' + hub + "</html>\n")
+
+# Redirect stubs for the old root URLs (meta refresh with delay 0 is treated by Google as a permanent redirect)
+for f in MOVED:
+    new = BASE + EXCEL + f
+    (ROOT / f).write_text(f'<!doctype html>\n<html lang="en"><head><meta charset="utf-8"><title>Moved</title>'
+        f'<link rel="canonical" href="{new}"><meta http-equiv="refresh" content="0; url={EXCEL}{f}">'
+        f'<script>location.replace("{EXCEL}{f}"+location.hash)</script></head>'
+        f'<body><p>This page moved to <a href="{EXCEL}{f}">{new}</a>.</p></body></html>\n')
+
+# Site-wide pages keep their text; only the name and canonical URL are refreshed
+for f in ("about.html", "privacy.html"):
+    t = (ROOT / f).read_text()
+    t = re.sub(r'<link rel="canonical" href="[^"]*">', f'<link rel="canonical" href="{BASE}{f}">', t, count=1)
+    t = re.sub(r'<title>(.*?) · [^<]*</title>', rf'<title>\1 · {SITE_NAME}</title>', t, count=1)
+    t = re.sub(r'<a href="./">← [^<]*</a>', f'<a href="./">← {SITE_NAME}</a>', t, count=1)
+    (ROOT / f).write_text(t)
+
+(ROOT / "robots.txt").write_text(f"User-agent: *\nAllow: /\nSitemap: {BASE}sitemap.xml\n")
+urls = [BASE] + [BASE + EXCEL + ("" if p["file"] == "index.html" else p["file"]) for p in PAGES] + [BASE + "about.html", BASE + "privacy.html"]
 (ROOT / "sitemap.xml").write_text('<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + "".join(f"  <url><loc>{u}</loc><lastmod>{TODAY}</lastmod></url>\n" for u in urls) + "</urlset>\n")
-print("built", len(PAGES), "pages")
+print("built hub +", len(PAGES), "Excel pages +", len(MOVED), "redirects; base", BASE)

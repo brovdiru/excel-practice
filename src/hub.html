@@ -1,0 +1,75 @@
+<title>{SITE_NAME}: Free Practice for Job Skills Tests</title>
+<meta name="description" content="Free interactive practice for pre-employment skills tests. Start with Excel formulas: 29 exercises checked like Excel would, plus a timed mock test. No sign-up.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script>if(location.hash==='#mock')location.replace('excel/#mock');</script>
+<style>
+:root{--bg:#f3f5f2;--surface:#fff;--ink:#16201b;--muted:#5a6862;--line:#d6ddd8;--head:#e9eeea;--accent:#1d6b57;--accent-ink:#fff;
+  --f-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;--f-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1412;--surface:#161d1a;--ink:#e4ebe7;--muted:#97a69f;--line:#2a3530;--head:#1d2622;--accent:#5fc3a3;--accent-ink:#0c1512;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0f1412;--surface:#161d1a;--ink:#e4ebe7;--muted:#97a69f;--line:#2a3530;--head:#1d2622;--accent:#5fc3a3;--accent-ink:#0c1512;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--f-body);padding:0 max(16px,env(safe-area-inset-left)) 32px}
+.wrap{max-width:960px;margin:0 auto}
+h1,h2,h3{font-family:var(--f-display);line-height:1.15;text-wrap:balance;margin:0}
+a{color:var(--accent)}
+.top{display:flex;align-items:center;gap:10px;padding-block:20px}
+.logo{width:34px;height:34px;border-radius:7px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-family:var(--f-display);font-weight:800}
+.top b{font-family:var(--f-display);font-size:1.15rem}
+.hero{padding-block:28px 20px}
+.hero h1{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;max-width:18ch}
+.hero p{color:var(--muted);max-width:60ch;margin:12px 0 0;font-size:1.05rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:16px;margin-top:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;display:flex;flex-direction:column;gap:10px}
+.card h2{font-size:1.3rem}
+.card p{margin:0;color:var(--muted)}
+.card ul{margin:0;padding-left:1.1em}
+.tag{align-self:flex-start;font-size:.72rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:999px;background:var(--head);color:var(--muted)}
+.tag.live{background:var(--accent);color:var(--accent-ink)}
+.btn{align-self:flex-start;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:600;padding:9px 18px;border-radius:999px;margin-top:4px}
+.card.soon{border-style:dashed;background:transparent}
+.article{max-width:68ch;margin-top:40px}
+.article h2{font-size:1.4rem;margin-top:28px}
+footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:.85rem}
+</style>
+
+<div class="wrap">
+  <header class="top"><div class="logo" aria-hidden="true">✓</div><b>{SITE_NAME}</b></header>
+
+  <section class="hero">
+    <h1>Practice for job skills tests, for free</h1>
+    <p>Many employers screen applicants with short online skills tests. Here you practise the real tasks in your browser, with instant feedback. No sign-up, no download.</p>
+  </section>
+
+  <section class="grid" aria-label="Practice tools">
+    <article class="card">
+      <span class="tag live">Available</span>
+      <h2>Excel formula practice</h2>
+      <p>29 exercises on a real sales table, checked the way Excel would calculate them, plus a timed 15-minute mock test.</p>
+      <ul>
+        <li><a href="excel/vlookup-practice.html">VLOOKUP, INDEX/MATCH and XLOOKUP</a></li>
+        <li><a href="excel/sumif-countif-practice.html">SUMIF, COUNTIF and SUMIFS</a></li>
+        <li><a href="excel/if-function-practice.html">IF, AND and OR</a></li>
+        <li><a href="excel/excel-text-functions-practice.html">Text functions</a></li>
+        <li><a href="excel/excel-basic-formulas-practice.html">Basic formulas and $ references</a></li>
+      </ul>
+      <p>Preparing for a specific test? <a href="excel/indeed-excel-assessment-practice.html">Indeed</a>, <a href="excel/kenexa-excel-test-practice.html">Kenexa</a>, <a href="excel/testgorilla-excel-test-practice.html">TestGorilla</a>.</p>
+      <a class="btn" href="excel/">Start Excel practice</a>
+    </article>
+    <article class="card soon">
+      <span class="tag">In progress</span>
+      <h2>More tests are on the way</h2>
+      <p>New practice tools are added one at a time, each built around a common type of pre-employment test.</p>
+    </article>
+  </section>
+
+  <article class="article">
+    <h2>Why practise before a skills test</h2>
+    <p>Online assessments from platforms such as Indeed, TestGorilla and Kenexa are usually short and timed. Most people who know the material still lose points to the clock or to small slips, such as a missing <code>$</code> sign or the wrong argument order. Writing the answers yourself a few times before the test removes most of those slips.</p>
+    <h2>How the practice works</h2>
+    <p>Every tool here asks you to do the task, not to pick an option. You get a realistic example, type your answer, and see at once whether it is right and why. Your progress is saved only in your own browser.</p>
+  </article>
+
+  <footer><a href="about.html">About</a> · <a href="privacy.html">Privacy</a> · Excel is a trademark of Microsoft Corporation. This site is not affiliated with Microsoft or any testing company.</footer>
+</div>
